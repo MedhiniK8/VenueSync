@@ -24,42 +24,60 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="mx-auto flex min-h-full max-w-6xl items-center px-4 py-10">
-        <div className="grid w-full gap-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-soft lg:grid-cols-2 lg:p-8">
-          <section className="rounded-3xl bg-gradient-to-br from-tealbrand to-bluebrandDeep p-8 text-white">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80">VenueSync</p>
-            <h1 className="mt-6 text-4xl font-bold leading-tight">Smart venue booking for KLE Technological University.</h1>
-            <p className="mt-4 max-w-md text-sm leading-6 text-white/85">
-              Book venues with role-based access, conflict checks, and admin approvals in one controlled workflow.
-            </p>
-          </section>
+    <div className="flex min-h-screen bg-white">
+      <div className="hidden lg:relative lg:flex lg:w-1/2 lg:flex-col lg:justify-end lg:bg-slate-900">
+        <img
+          src="/login-bg.png"
+          alt="Architecture"
+          className="absolute inset-0 h-full w-full object-cover opacity-80 mix-blend-overlay"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+        <div className="relative z-10 p-12 text-white">
+          <p className="text-sm font-bold uppercase tracking-[0.25em] text-brand-300">VenueSync</p>
+          <h1 className="mt-4 text-4xl font-extrabold leading-tight tracking-tight">
+            Smart venue booking for KLE Technological University.
+          </h1>
+          <p className="mt-4 max-w-lg text-lg leading-relaxed text-slate-300">
+            Book venues with role-based access, conflict checks, and admin approvals in one controlled workflow.
+          </p>
+        </div>
+      </div>
 
-          <section className="flex items-center">
-            <form onSubmit={submit} className="w-full space-y-4">
-              <h2 className="text-2xl font-bold text-slate-900">Login</h2>
+      <div className="flex w-full items-center justify-center p-8 lg:w-1/2 lg:p-12 xl:p-24">
+        <div className="w-full max-w-md">
+          <div className="mb-8 lg:hidden">
+            <p className="text-sm font-bold uppercase tracking-[0.25em] text-brand-600">VenueSync</p>
+          </div>
+          
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Sign in to your account</h2>
+          <p className="mt-2 text-sm text-slate-500">Welcome back! Please enter your details.</p>
+
+          <form onSubmit={submit} className="mt-8 space-y-6">
+            <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Email</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">Email</label>
                 <input
                   type="email"
                   required
+                  placeholder="Enter your email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className="input"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Password</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">Password</label>
                 <input
                   type="password"
                   required
+                  placeholder="••••••••"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   className="input"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Role</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">Role</label>
                 <select
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
@@ -70,21 +88,23 @@ const Login = () => {
                   <option value="admin">Admin</option>
                 </select>
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-xl bg-tealbrand px-4 py-3 font-semibold text-white transition hover:bg-tealbrandSoft disabled:opacity-60"
-              >
-                {loading ? 'Signing in...' : 'Login'}
-              </button>
-              <p className="text-sm text-slate-600">
-                Don&apos;t have an account?{' '}
-                <Link to="/register" className="font-semibold text-tealbrand hover:underline">
-                  Register here
-                </Link>
-              </p>
-            </form>
-          </section>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex w-full justify-center rounded-lg bg-brand-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-500 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:opacity-50"
+            >
+              {loading ? 'Signing in...' : 'Sign in'}
+            </button>
+            
+            <p className="text-center text-sm text-slate-600">
+              Don&apos;t have an account?{' '}
+              <Link to="/register" className="font-semibold text-brand-600 hover:text-brand-500 hover:underline">
+                Create an account
+              </Link>
+            </p>
+          </form>
         </div>
       </div>
     </div>
