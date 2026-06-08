@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
+const kleTechEmailPattern = /^[^\s@]+@kletech\.ac\.in$/i;
+
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
@@ -25,11 +27,18 @@ const Register = () => {
       return;
     }
 
+    const email = form.email.trim().toLowerCase();
+
+    if (!kleTechEmailPattern.test(email)) {
+      pushToast('Only @kletech.ac.in email addresses are allowed', 'error');
+      return;
+    }
+
     try {
       setLoading(true);
       await register({
         name: form.name,
-        email: form.email,
+        email,
         password: form.password,
         role: form.role,
         department: form.department,
@@ -88,6 +97,7 @@ const Register = () => {
                   <input
                     type={type}
                     required={required}
+                    {...(key === 'email' ? { pattern: '^[^\\s@]+@kletech\\.ac\\.in$', title: 'Use a @kletech.ac.in email address' } : {})}
                     placeholder={label}
                     value={form[key]}
                     onChange={(e) => setForm({ ...form, [key]: e.target.value })}

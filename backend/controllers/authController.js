@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { isKleTechEmail, normalizeEmail } = require('../utils/validation');
 
 const register = async (req, res) => {
   try {
@@ -10,7 +11,16 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'All required fields must be filled' });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (!isKleTechEmail(email)) {
+      return res.status(400).json({ message: 'Only @kletech.ac.in email addresses are allowed' });
+    }
+
+    if (!['student', 'teacher', 'admin'].includes(role)) {
+      return res.status(400).json({ message: 'Invalid role selected' });
+    }
+
+    const normalizedEmail = normalizeEmail(email);
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already registered' });
     }
@@ -18,7 +28,7 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
       name,
-      email: email.toLowerCase(),
+      email: normalizedEmail,
       password: hashedPassword,
       role,
       department,
@@ -47,7 +57,11 @@ const login = async (req, res) => {
       return res.status(400).json({ message: 'Email, password, and role are required' });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!isKleTechEmail(email)) {
+      return res.status(400).json({ message: 'Only @kletech.ac.in email addresses are allowed' });
+    }
+
+    const user = await User.findOne({ email: normalizeEmail(email) });
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }

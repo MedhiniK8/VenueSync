@@ -2,6 +2,7 @@ const Booking = require('../models/Booking');
 const Notification = require('../models/Notification');
 const Venue = require('../models/Venue');
 const User = require('../models/User');
+const { parsePositiveInteger } = require('../utils/validation');
 const { checkSlotAvailability, normalizeDate, toMinutes } = require('../utils/checkAvailability');
 
 const bookingPopulation = [
@@ -18,6 +19,10 @@ const checkAvailability = async (req, res) => {
     const { venueId, eventDate, startTime, endTime } = req.body;
     if (!venueId || !eventDate || !startTime || !endTime) {
       return res.status(400).json({ message: 'Missing required availability fields' });
+    }
+
+    if (startTime >= endTime) {
+      return res.status(400).json({ message: 'End Time must be after Start Time' });
     }
 
     const result = await checkSlotAvailability(venueId, eventDate, startTime, endTime);
@@ -47,8 +52,23 @@ const createBooking = async (req, res) => {
       return res.status(404).json({ message: 'Venue not found' });
     }
 
-    if (Number(req.body.capacityRequired || req.body.capacity || 0) > venue.capacity) {
+    const capacityRequired = parsePositiveInteger(req.body.capacityRequired || req.body.capacity);
+    const expectedCrowd = parsePositiveInteger(req.body.expectedCrowd);
+
+    if (!capacityRequired) {
+      return res.status(400).json({ message: 'Capacity required must be a number greater than zero' });
+    }
+
+    if (!expectedCrowd) {
+      return res.status(400).json({ message: 'Expected number of participants must be a number greater than zero' });
+    }
+
+    if (capacityRequired > venue.capacity) {
       return res.status(400).json({ message: 'Capacity required cannot exceed venue capacity' });
+    }
+
+    if (req.body.startTime >= req.body.endTime) {
+      return res.status(400).json({ message: 'End Time must be after Start Time' });
     }
 
     const availability = await checkSlotAvailability(req.body.venueId, req.body.eventDate, req.body.startTime, req.body.endTime);
@@ -91,6 +111,8 @@ const createBooking = async (req, res) => {
         userId: req.user.userId,
         userRole: req.user.role,
         priority: incomingPriority,
+        capacityRequired,
+        expectedCrowd,
         status: 'pending'
       });
 
@@ -122,6 +144,8 @@ const createBooking = async (req, res) => {
       userId: req.user.userId,
       userRole: req.user.role,
       priority: req.user.role === 'teacher' ? 2 : 1,
+      capacityRequired,
+      expectedCrowd,
       status: 'pending'
     });
 

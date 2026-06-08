@@ -5,6 +5,11 @@ import { useToast } from '../../context/ToastContext';
 const eventTypes = ['Workshop', 'Seminar', 'Hackathon', 'Meeting', 'Fest', 'Other'];
 const audienceTypes = ['Students', 'Faculty', 'External Guests', 'Mixed'];
 
+const parsePositiveInteger = (value) => {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+};
+
 const BookingForm = ({ venue, onSuccess }) => {
   const { pushToast } = useToast();
   const [availableState, setAvailableState] = useState({ checked: false, available: false, message: '' });
@@ -71,7 +76,20 @@ const BookingForm = ({ venue, onSuccess }) => {
   };
 
   const submitBooking = async () => {
-    if (Number(form.capacityRequired || 0) > Number(venue.capacity)) {
+    const capacityRequired = parsePositiveInteger(form.capacityRequired);
+    const expectedCrowd = parsePositiveInteger(form.expectedCrowd);
+
+    if (!capacityRequired) {
+      pushToast('Capacity Required must be a number greater than zero', 'error');
+      return;
+    }
+
+    if (!expectedCrowd) {
+      pushToast('Expected Number of Participants must be a number greater than zero', 'error');
+      return;
+    }
+
+    if (capacityRequired > Number(venue.capacity)) {
       pushToast('Capacity Required cannot exceed venue capacity', 'error');
       return;
     }
@@ -92,8 +110,8 @@ const BookingForm = ({ venue, onSuccess }) => {
         venueId: venue._id,
         ...form,
         eventDate: form.eventDate,
-        expectedCrowd: Number(form.expectedCrowd),
-        capacityRequired: Number(form.capacityRequired)
+        expectedCrowd,
+        capacityRequired
       });
       pushToast('Booking request submitted successfully! Awaiting admin approval.', 'success');
       onSuccess?.();
@@ -126,8 +144,8 @@ const BookingForm = ({ venue, onSuccess }) => {
           <input className="input" type="time" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
         </div>
         <input className="input" readOnly value={venue.name} />
-        <input className="input" type="number" placeholder="Capacity Required" value={form.capacityRequired} onChange={(e) => setForm({ ...form, capacityRequired: e.target.value })} />
-        <input className="input" type="number" placeholder="Expected Number of Participants" value={form.expectedCrowd} onChange={(e) => setForm({ ...form, expectedCrowd: e.target.value })} />
+        <input className="input" type="number" min="1" step="1" placeholder="Capacity Required" value={form.capacityRequired} onChange={(e) => setForm({ ...form, capacityRequired: e.target.value })} />
+        <input className="input" type="number" min="1" step="1" placeholder="Expected Number of Participants" value={form.expectedCrowd} onChange={(e) => setForm({ ...form, expectedCrowd: e.target.value })} />
         <select className="input" value={form.audienceType} onChange={(e) => setForm({ ...form, audienceType: e.target.value })}>
           {audienceTypes.map((type) => <option key={type}>{type}</option>)}
         </select>

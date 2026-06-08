@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
+import AddVenue from './AddVenue';
 import BookingRequests from './BookingRequests';
 import AllVenues from './AllVenues';
 import AdminNotifications from './AdminNotifications';
@@ -25,6 +26,7 @@ const AdminDashboard = () => {
 
   const items = [
     { key: 'overview', label: 'Overview' },
+    { key: 'add-venue', label: 'Add Venue' },
     { key: 'requests', label: 'Booking Requests' },
     { key: 'venues', label: 'All Venues' },
     { key: 'notifications', label: 'Notifications' }
@@ -116,6 +118,7 @@ const AdminDashboard = () => {
               </>
             )}
 
+            {activeTab === 'add-venue' && <AddVenue onCreated={() => setActiveTab('venues')} />}
             {activeTab === 'requests' && <BookingRequests />}
             {activeTab === 'venues' && <AllVenues />}
             {activeTab === 'notifications' && <AdminNotifications />}

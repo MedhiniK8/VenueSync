@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
+const kleTechEmailPattern = /^[^\s@]+@kletech\.ac\.in$/i;
+
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -12,9 +14,16 @@ const Login = () => {
 
   const submit = async (event) => {
     event.preventDefault();
+    const email = form.email.trim().toLowerCase();
+
+    if (!kleTechEmailPattern.test(email)) {
+      pushToast('Only @kletech.ac.in email addresses are allowed', 'error');
+      return;
+    }
+
     try {
       setLoading(true);
-      const result = await login(form);
+      const result = await login({ ...form, email });
       navigate(result.redirectTo, { replace: true });
     } catch (error) {
       pushToast(error?.response?.data?.message || 'Login failed', 'error');
@@ -59,6 +68,8 @@ const Login = () => {
                 <input
                   type="email"
                   required
+                  pattern="^[^\s@]+@kletech\.ac\.in$"
+                  title="Use a @kletech.ac.in email address"
                   placeholder="Enter your email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
